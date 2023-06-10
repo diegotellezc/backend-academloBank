@@ -1,5 +1,5 @@
-const AppError = require('./../utils/appError');
-const logger = require('./../utils/logger');
+const AppError = require('../utils/appError');
+const logger = require('../utils/logger');
 
 const handleCastError23505 = () =>
   new AppError('Duplicate field value: please use another value', 400);

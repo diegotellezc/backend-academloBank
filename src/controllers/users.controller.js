@@ -4,7 +4,7 @@ const catchAsync = require('../utils/catchAsync');
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, password } = req.body;
 
-  const accountNumber = () => Math.floor(Math.random() * 900000) + 100000;
+  const accountNumber = Math.floor(Math.random() * 900000) + 100000;
 
   const user = await Users.create({
     name,
