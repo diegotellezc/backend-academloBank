@@ -20,16 +20,38 @@ exports.createUserValidation = [
     .withMessage('Password cannot be empty')
     .isLength({ min: 8 })
     .withMessage('Password must be at least 8 characters'),
+  validFields,
 ];
 
 exports.loginUserValidation = [
   body('accountNumber')
     .notEmpty()
-    .withMessage('Account Number cannot be empty'),
+    .withMessage('Account Number cannot be empty')
+    .isLength({ min: 6, max: 6 })
+    .withMessage('Account number must be 6 digits'),
   body('password')
     .notEmpty()
     .withMessage('Password cannot be empty')
     .isLength({ min: 8 })
     .withMessage('Password must be at least 8 characters'),
+  validFields,
+];
+
+exports.transferValidation = [
+  body('amount')
+    .notEmpty()
+    .withMessage('Amount cannot be empty')
+    .isInt({ min: 1 })
+    .withMessage('Amount must be a positive integer'),
+  body('senderUserId')
+    .notEmpty()
+    .withMessage('User Id cannot be empty')
+    .isInt({ min: 1 })
+    .withMessage('Amount must be a positive integer'),
+  body('receiverUserId')
+    .notEmpty()
+    .withMessage('User Id cannot be empty')
+    .isInt({ min: 1 })
+    .withMessage('Amount must be a positive integer'),
   validFields,
 ];

@@ -1,27 +1,71 @@
 const Users = require('../models/users.model');
 const catchAsync = require('../utils/catchAsync');
+const bcrypt = require('bcryptjs');
+const generateJWT = require('../utils/jwt');
+const AppError = require('../utils/appError');
 
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, password } = req.body;
 
   const accountNumber = Math.floor(Math.random() * 900000) + 100000;
 
+  const salt = await bcrypt.genSalt(12);
+  const encryptedPassword = await bcrypt.hash(password, salt);
+
   const user = await Users.create({
-    name,
+    name: name.toLowerCase(),
     accountNumber,
-    password,
+    password: encryptedPassword,
   });
+
+  const token = await generateJWT(user.id);
 
   res.status(200).json({
     status: 'success',
     message: 'The user has been created',
-    user,
+    token,
+    user: {
+      id: user.id,
+      name: user.name,
+      accountNumber: user.accountNumber,
+      amount: user.amount,
+    },
   });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
+  const { accountNumber, password } = req.body;
+
+  const user = await Users.findOne({
+    where: {
+      accountNumber,
+      status: 'active',
+    },
+  });
+
+  if (!user) {
+    return next(
+      new AppError(
+        `User with account number:${accountNumber} was not found`,
+        404
+      )
+    );
+  }
+
+  if (!(await bcrypt.compare(password, user.password))) {
+    return next(new AppError(`Wrong account number or password`, 401));
+  }
+
+  const token = await generateJWT(user.id);
+
   res.status(200).json({
     status: 'success',
-    message: 'This is the login',
+    token,
+    user: {
+      id: user.id,
+      name: user.name,
+      accountNumber: user.accountNumber,
+      amount: user.amount,
+    },
   });
 });
