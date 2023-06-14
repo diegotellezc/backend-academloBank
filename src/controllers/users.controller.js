@@ -1,4 +1,5 @@
 const Users = require('../models/users.model');
+const Transfers = require('../models/transfers.model');
 const catchAsync = require('../utils/catchAsync');
 const bcrypt = require('bcryptjs');
 const generateJWT = require('../utils/jwt');
@@ -67,5 +68,46 @@ exports.login = catchAsync(async (req, res, next) => {
       accountNumber: user.accountNumber,
       amount: user.amount,
     },
+  });
+});
+
+exports.findHistory = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const user = await Users.findOne({
+    where: {
+      id,
+      status: 'active',
+    },
+  });
+
+  if (!user) {
+    return next(
+      new AppError(
+        `User with account number:${accountNumber} was not found`,
+        404
+      )
+    );
+  }
+
+  const transfersById = await Transfers.findAll({
+    where: {
+      senderUserId: id,
+    },
+  });
+
+  if (!transfersById) {
+    return next(new AppError(`User with id:${id} has not made transfers`, 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    user: {
+      id: user.id,
+      name: user.name,
+      accountNumber: user.accountNumber,
+    },
+    tranfersDone: transfersById.length,
+    transfersById,
   });
 });

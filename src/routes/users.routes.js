@@ -19,6 +19,6 @@ router.post(
   usersController.login
 );
 
-// router.get('/:id/history', usersController.findAll);
+router.get('/:id/history', usersController.findHistory);
 
 module.exports = router;
