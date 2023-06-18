@@ -82,12 +82,7 @@ exports.findHistory = catchAsync(async (req, res, next) => {
   });
 
   if (!user) {
-    return next(
-      new AppError(
-        `User with account number:${accountNumber} was not found`,
-        404
-      )
-    );
+    return next(new AppError(`User with id:${id} was not found`, 404));
   }
 
   const transfersById = await Transfers.findAll({
